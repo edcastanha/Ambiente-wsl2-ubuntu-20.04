@@ -1,0 +1,69 @@
+#Guia para ativação se Interface Grafica via acesso remoto no Ubuntu:
+
+PowerShell commandos:
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+wsl --set-default-version 2
+
+## -------------------------------------  ##
+
+# No terminal do Ubuntu:
+sudo apt update && sudo apt -y upgrade
+sudo apt-get purge xrdp
+sudo apt install -y xrdp
+sudo apt install -y xfce4
+sudo apt install -y xfce4-goodies
+
+# Recomendo fazer o ''backup''
+sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.bak
+
+sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
+sudo sed -i 's/max_bpp=32/#max_bpp=32\nmax_bpp=128/g' /etc/xrdp/xrdp.ini
+sudo sed -i 's/xserverbpp=24/#xserverbpp=24\nxserverbpp=128/g' /etc/xrdp/xrdp.ini
+echo xfce4-session > ~/.xsession
+
+# Editando (nano ou vs code)
+sudo nano /etc/xrdp/startwm.sh
+
+#commente as linhas abaixo:
+  #test -x /etc/X11/Xsession && exec /etc/X11/Xsession
+  #exec /bin/sh /etc/X11/Xsession
+
+# Adicione essa linha e salve o arquivo:
+# xfce
+startxfce4
+
+sudo /etc/init.d/xrdp start
+
+# Retorno esperado:
+# * Starting Remote Desktop Protocol server . . . . . [ OK ]
+
+
+# Confirir IP da maquina WSL
+ip addr | grep eth0
+
+## -------------------------------------  ##
+
+# No Windows, use Remote Desktop Connection com o ip da maquina
+# localhost:3390
+
+# Use o mesmo login do Ubuntu username e password
+
+#  * * * DICAS * * *
+# Para criar atalho de comando
+# @ Listar Usuarios:
+# alias usuarios="cut -d : -f 1,5 /etc/passwd | tr : \\\t"
+# @ Listar ip local:
+# alias ipconfig="ip addr | grep eth0"
+
+
+#Referencias links:
+# Microsoft GUI announcement: https://devblogs.microsoft.com/commandline/the-windows-subsystem-for-linux-build-2020-summary/
+
+# Ubuntu WSL2 GUI Install:
+# https://dev.to/darksmile92/linux-on-windows-wsl-with-desktop-environment-via-rdp-522g
+# WSL 2 install: https://docs.microsoft.com/en-us/windows/wsl/install-win10
+# Docker no WSL2: https://docs.docker.com/docker-for-windows/wsl/
+# O que é WSL? https://docs.microsoft.com/en-us/windows/wsl/about
+# WSL documentação: https://docs.microsoft.com/en-us/windows/wsl/
+# WSL 2 : https://devblogs.microsoft.com/commandline/announcing-wsl-2/
